@@ -78,7 +78,6 @@ def run_a_experiments():
         acc, std, time, sparsity, dimensions = cv_binary_classification(model, X, y, continuous, categorical, encoder=BetaEncoder(alpha=alpha_prior, beta=1-alpha_prior), moments='mv')
         results.append([type(model), 'BetaEncoder (mv)', acc, std, time, sparsity, dimensions])
 
-
     file = 'adult_experiments.csv'
     with open(file, "w") as output:
         writer = csv.writer(output, lineterminator='\n')
@@ -88,8 +87,10 @@ def run_a_experiments():
     except:
         print("File Not Uploaded")
 
-def load_data(local=False):
-    if not local:
+
+def load_data():
+    exists = os.path.isfile('adult_raw.csv')
+    if not exists:
         url="https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"
         r=requests.get(url).content
         df=pd.read_csv(io.StringIO(r.decode('utf-8')),header=None)
@@ -113,12 +114,12 @@ def load_data(local=False):
         'hours-per-week',
         'native-country',
         'class']
-    new_name = dict(enumerate(names))
-
+    new_name = {str(k): v for k, v in dict(enumerate(names)).items()}
     df = df.rename(new_name,axis='columns')
     df['class'] = (df['class']==' >50K').astype(int)
 
     return df
+
 
 if __name__ == '__main__':
     run_a_experiments()
